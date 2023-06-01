@@ -7,28 +7,34 @@ from text_to_speech import text_to_speech
 from play_audio import play_audio
 from picture_generator import image_generation
 
-
 def main():
 
     while(True):
 
+        print("I'm listening...\n")
         my_message = speech_to_text()
         print(f"You: {my_message}\n")
 
-        if my_message.lower() in ['нарисуй', 'нарисуй.']:
+        if my_message.strip().lower().replace(".", "") in ['нарисуй', "draw", "그려 줘", "그려 주세요"]:
 
-            play_audio("sound/okidraw.mp3")
+            play_audio("sound/ok.mp3")
             prompt = speech_to_text()
+
             if prompt:
-                print(f"Drawing: {prompt}\nPlease wait a second, thanks")
+
+                print(f"Drawing: {prompt}. Please wait a second, thanks\n")
                 play_audio("sound/drawing.mp3")
 
                 created_image_url = list(image_generation(prompt))[0]
                 webbrowser.open(created_image_url, new=0, autoraise=True)
                 play_audio("sound/done.mp3")
-            else: print("I didn't hear what need to draw, sorry")
+
+            else: 
+                play_audio("sound/sorry.mp3")
         
-        else:
+
+        else: #chatGPT response 
+            
             gpt_response = generate_response(my_message)
             print(f"ChatGTP: {gpt_response}\n")
 
@@ -38,6 +44,7 @@ def main():
 
             text_to_speech(gpt_response, filename)
             play_audio(filename)
+
 
 if __name__ == "__main__":
     main()

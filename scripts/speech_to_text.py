@@ -8,7 +8,6 @@ def speech_to_text():
 
     try:
         with sr.Microphone() as source:
-            print("I'm listening...")
             audio = r.listen(source, timeout = 10)
 
         with open("sound/microphone-results.wav", "wb") as f:
