@@ -9,14 +9,18 @@ from picture_generator import image_generation
 
 def main():
 
+    prompt = [{"role": "system", "content": """As an AI language model, I try my best to understand and respond 
+    in the language that is used to communicate with me. If you ask me a question in English, I will respond in 
+    English. If you ask me a question in Korean, I will respond in Korean. If you ask me a question in Russian, 
+    I will respond in Russian."""}]
+    # prompt = [{"role": "system", "content": "As your best friend, I try my best to understand and respond on your questions."}]
+    
     while(True):
 
-        print("I'm listening...\n")
         my_message = speech_to_text()
-        print(f"You: {my_message}\n")
+        print(f"\nHuman: \033[94m{my_message}\033[0m")
 
-        if my_message.strip().lower().replace(".", "") in ['нарисуй', "draw", "그려 줘", "그려 주세요"]:
-
+        if my_message.strip().lower().replace(".", "") in ['нарисуй', "draw a picture", "그려 줘", "그려 주세요", "그려줘"]:
             play_audio("sound/ok.mp3")
             prompt = speech_to_text()
 
@@ -24,9 +28,10 @@ def main():
 
                 print(f"Drawing: {prompt}. Please wait a second, thanks\n")
                 play_audio("sound/drawing.mp3")
-
-                created_image_url = list(image_generation(prompt))[0]
-                webbrowser.open(created_image_url, new=0, autoraise=True)
+                
+                created_image_urls = image_generation(prompt, 4)
+                for url in created_image_urls:
+                    webbrowser.open(url, new=0, autoraise=True)
                 play_audio("sound/done.mp3")
 
             else: 
@@ -34,9 +39,12 @@ def main():
         
 
         else: #chatGPT response 
-            
-            gpt_response = generate_response(my_message)
-            print(f"ChatGTP: {gpt_response}\n")
+
+            prompt.append({"role":"user","content":my_message})
+            gpt_response = generate_response(prompt)
+
+            print(f"AI: \033[92m{gpt_response}\033[0m\n")
+            prompt.append({"role": "system", "content": gpt_response})
 
             #made a uniq filename
             date_string = datetime.now().strftime("%d%m%Y%H%M%S")

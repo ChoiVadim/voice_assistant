@@ -1,31 +1,33 @@
 import openai
+from time import time
 
 with open("openaikey.txt", "r") as f:
     openai.api_key = f.read()
 
 def generate_response(user_input):
 
-    prompt = [{"role": "system", "content": """As an AI language model, I try my best to understand and respond 
-    in the language that is used to communicate with me. If you ask me a question in English, I will respond in 
-    English. If you ask me a question in Korean, I will respond in Korean. If you ask me a question in Russian, 
-    I will respond in Russian."""}]
+    try:
+        response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=user_input,
+        # max_tokens=1000,
+        temperature=0.4,
+        )
 
-    prompt.append({"role":"user","content":user_input})
+        message = response.choices[0].message.content
+        return message
+    
+    except openai.error.RateLimitError:
+        print("Rate limit reached. Wait 1 min:)")
+        time.sleep(60)
 
-    response = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo",
-    messages=prompt,
-    max_tokens=1000,
-    temperature=0.2,
-    )
-
-    message = response.choices[0].message.content
-    prompt.append({"role": "system", "content": message})
-
-    return message
+    # except openai.error.InvalidRequestError:
+        
+    
 
 def main():
-    generate_response(input())
+    while True:
+        print(generate_response([{"role":"user","content": input("Enter: ")}]))
 
 if __name__ == "__main__":
     main()

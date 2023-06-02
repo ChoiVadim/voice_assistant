@@ -7,11 +7,14 @@ def speech_to_text():
     r.energy_threshold = 4000
 
     try:
+        print("Listening...")
         with sr.Microphone() as source:
             audio = r.listen(source, timeout = 10)
 
         with open("sound/microphone-results.wav", "wb") as f:
             f.write(audio.get_wav_data())
+        
+        print("Audio record end. Transcribing...")
 
         #openai whisper speech to text 
         audio_file= open("sound/microphone-results.wav", "rb")
